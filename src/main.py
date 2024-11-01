@@ -1,7 +1,9 @@
 # from blessed import Terminal
+import random
 
 # config:
 TABLE_SIZE = 4
+
 
 # funcs
 def new_empty_table(table_size):
@@ -23,6 +25,12 @@ def get_empty_cells(table:list):
 
   return empty_cells
 
+def get_random_cell(cells:list):
+  cells_count = len(cells)
+  random_index = random.randint(0,cells_count)
+  random_cell = cells[random_index]
+  return random_cell
+
 
 
 
@@ -30,6 +38,7 @@ def main():
   game_table = new_empty_table(TABLE_SIZE)
   print(game_table)
   print(get_empty_cells(game_table))
+  print(get_random_cell(get_empty_cells(game_table)))
 
 
 
