@@ -33,6 +33,15 @@ def get_random_cell(cells:list):
 
 
 
+def add_next_number(table:list,item:int):
+  empty_cells = get_empty_cells(table)
+  random_cell = get_random_cell(empty_cells)
+  table[random_cell[0]][random_cell[1]] = item
+  return table
+
+
+
+
 
 def main():
   game_table = new_empty_table(TABLE_SIZE)
