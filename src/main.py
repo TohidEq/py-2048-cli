@@ -58,10 +58,17 @@ def add_next_number(table:list,item:int):
 
 def move_row_right(table,y,x):
   new_table = table;
-
   for i in range(x, 0, -1): # "-1" -> reversed
     new_table[y][i] = table[y][i-1]
   new_table[y][0]=0;
+  return new_table
+
+
+def move_row_left(table,y,x):
+  new_table = table;
+  for i in range(x, TABLE_SIZE-1):
+    new_table[y][i] = table[y][i+1]
+  new_table[y][TABLE_SIZE-1]=0;
   return new_table
 
 
@@ -112,10 +119,11 @@ def main():
   # print(get_empty_cells(game_table))
   # print(get_random_cell(get_empty_cells(game_table)))
 
-  test_table = [[1,1,2,3,4,5,0,7,0]]
+  test_table = [[0,1,0,3]]
 
   print(test_table)
-  print(move_row_right(test_table,0,6))
+  # print(move_row_right(test_table,0,2))
+  print(move_row_left(test_table,0,0))
 
 
 
