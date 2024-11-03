@@ -71,6 +71,14 @@ def move_row_left(table,y,x):
   new_table[y][TABLE_SIZE-1]=0;
   return new_table
 
+def move_col_down(table,y,x):
+  new_table = table;
+  for i in range(y, 0, -1): # "-1" -> reversed
+    new_table[i][x] = table[i-1][x]
+  new_table[0][x]=0;
+  return new_table
+
+
 def move_row_right(table,y,x):
   new_table = table;
   for i in range(x, 0, -1): # "-1" -> reversed
@@ -128,7 +136,7 @@ def main():
   # print(get_empty_cells(game_table))
   # print(get_random_cell(get_empty_cells(game_table)))
 
-  test_table = [[0, 0, 0, 0],
+  test_table = [[0, -1, 0, 0],
                 [0, 1, 0, 0],
                 [0, 2, 0, 0],
                 [0, 3, 0, 0]]
@@ -136,7 +144,8 @@ def main():
   print(test_table)
   # print(move_row_right(test_table,0,2))
   # print(move_row_left(test_table,0,0))
-  print(move_col_top(test_table,2,1))
+  # print(move_col_top(test_table,2,1))
+  print(move_col_down(test_table,2,1))
 
 
 
