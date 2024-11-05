@@ -56,22 +56,22 @@ def add_next_number(table:list,item:int):
   return table
 
 
-
-def move_col_top(table,y,x):
+# moving cols(top and down) and rows(left and right) with an empty cells x,y only
+def move_col_top(table:list,y,x):
   new_table = table;
   for i in range(y, TABLE_SIZE-1):
     new_table[i][x] = table[i+1][x]
   new_table[TABLE_SIZE-1][x]=0;
   return new_table
 
-def move_row_left(table,y,x):
+def move_row_left(table:list,y,x):
   new_table = table;
   for i in range(x, TABLE_SIZE-1):
     new_table[y][i] = table[y][i+1]
   new_table[y][TABLE_SIZE-1]=0;
   return new_table
 
-def move_col_down(table,y,x):
+def move_col_down(table:list,y,x):
   new_table = table;
   for i in range(y, 0, -1): # "-1" -> reversed
     new_table[i][x] = table[i-1][x]
@@ -79,55 +79,64 @@ def move_col_down(table,y,x):
   return new_table
 
 
-def move_row_right(table,y,x):
+def move_row_right(table:list,y,x):
   new_table = table;
   for i in range(x, 0, -1): # "-1" -> reversed
     new_table[y][i] = table[y][i-1]
   new_table[y][0]=0;
   return new_table
 
+def move_table_top(table:list):
+  empty_cells = get_empty_cells(table)
+  empty_cells.reverse()
+  for empty_cell in empty_cells:
+    table = move_col_top(table, empty_cell["y"], empty_cell["x"])
+  return table
+
+def move_table_left(table:list):
+  empty_cells = get_empty_cells(table)
+  empty_cells.reverse()
+  for empty_cell in empty_cells:
+    table = move_row_left(table, empty_cell["y"], empty_cell["x"])
+  return table
+
+def move_table_down(table:list):
+  empty_cells = get_empty_cells(table)
+  for empty_cell in empty_cells:
+    table = move_col_down(table, empty_cell["y"], empty_cell["x"])
+  return table
+
+def move_table_right(table:list):
+  empty_cells = get_empty_cells(table)
+  for empty_cell in empty_cells:
+    table = move_row_right(table, empty_cell["y"], empty_cell["x"])
+  return table
 
 
 
 def move_table(table:list, move:str):
+  new_table = table
   # move = top, left, down, right
-  table
-  empty_cells = get_empty_cells(table)
-  # sort a row:
   match move:
     case "top":
-      print("move to the top")
-
+      new_table = move_table_top(new_table)
     case "left":
-      print("move to the left")
-
+      new_table = move_table_left(new_table)
     case "down":
-      print("move to the down")
-
+      new_table = move_table_down(new_table)
     case "right":
-      print("move to the right")
-
-      # way one:
-      # for y in range(0, TABLE_SIZE):
-      #   for x in range(TABLE_SIZE-1, 0, -1): # -1 : reversed
-      #     if table[y][x]==0:
-      #       print("move row to right")
-      #       table=move_row_right(table, y, x)
-      #       print(table)
-
-      # way two:
-      for empty_cell in empty_cells:
-        if empty_cell["x"] != 0:
-          table = move_row_right(table, empty_cell["y"], empty_cell["x"])
-
+      new_table = move_table_right(new_table)
     case _:
       print("incorrect move")
 
 
-  return table;
+  return new_table;
 
 
-
+# for see result in better style
+from pprint import pprint
+def p(t):
+  pprint(t,width=20, compact=True)
 
 def main():
   # game_table = new_empty_table(TABLE_SIZE)
@@ -136,15 +145,33 @@ def main():
   # print(get_random_cell(get_empty_cells(game_table)))
 
   test_table = [[0, 6, 0, 5],
-                [0, 1, 0, 2],
+                [2, 0, 1, 0],
                 [0, 2, 3, 0],
-                [0, 3, 4, 0]]
+                [5, 1, 4, 1]]
+  p(test_table)
+  p("-epmty-")
+  p(get_empty_cells(test_table))
 
-  print(test_table)
-  print("----")
-  table = move_table(test_table,"right")
-  print("----")
-  print(test_table)
+  print("---- t")
+  p(move_table_top([[0, 6, 0, 5],
+                [2, 0, 1, 0],
+                [0, 2, 3, 0],
+                [5, 1, 4, 1]]))
+  print("---- l")
+  p(move_table_left([[0, 6, 0, 5],
+                [2, 0, 1, 0],
+                [0, 2, 3, 0],
+                [5, 1, 4, 1]]))
+  print("---- d")
+  p(move_table_down([[0, 6, 0, 5],
+                [2, 0, 1, 0],
+                [0, 2, 3, 0],
+                [5, 1, 4, 1]]))
+  print("---- r")
+  p(move_table_right([[0, 6, 0, 5],
+                [2, 0, 1, 0],
+                [0, 2, 3, 0],
+                [5, 1, 4, 1]]))
 
   # print(move_row_right(test_table,0,2))
   # print(move_row_left(test_table,0,0))
