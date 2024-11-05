@@ -25,7 +25,7 @@ def new_empty_table(table_size):
   table = [[0]*table_size]*table_size
   return table
 
-
+# returns list [ {"y":y1,"x":x1} , {"y":y2,"x":x2} , ... ] of empty cells
 def get_empty_cells(table:list):
   empty_cells=[]
 
@@ -36,7 +36,7 @@ def get_empty_cells(table:list):
   for y in range(rows):
     for x in range(cols):
       if table[y][x]==0:
-        empty_cells.append([y,x])
+        empty_cells.append({"y":y,"x":x})
 
   return empty_cells
 
@@ -91,13 +91,8 @@ def move_row_right(table,y,x):
 
 def move_table(table:list, move:str):
   # move = top, left, down, right
-  new_table = new_empty_table(TABLE_SIZE);
-
-  value = 0
-  x = y = 0
-  max_y = len(table)
-  max_x = len(table[0])
-
+  table
+  empty_cells = get_empty_cells(table)
   # sort a row:
   match move:
     case "top":
@@ -111,21 +106,25 @@ def move_table(table:list, move:str):
 
     case "right":
       print("move to the right")
-      sorted = false;
-      while(not sorted):
-        y = 0
-        x = max_x
-        while x != 0:
-          if table[y][x]==0:
-            print("move row to right")
-          x -= 1
+
+      # way one:
+      # for y in range(0, TABLE_SIZE):
+      #   for x in range(TABLE_SIZE-1, 0, -1): # -1 : reversed
+      #     if table[y][x]==0:
+      #       print("move row to right")
+      #       table=move_row_right(table, y, x)
+      #       print(table)
+
+      # way two:
+      for empty_cell in empty_cells:
+        if empty_cell["x"] != 0:
+          table = move_row_right(table, empty_cell["y"], empty_cell["x"])
 
     case _:
       print("incorrect move")
-      new_table=table
 
 
-  return new_table;
+  return table;
 
 
 
@@ -136,16 +135,21 @@ def main():
   # print(get_empty_cells(game_table))
   # print(get_random_cell(get_empty_cells(game_table)))
 
-  test_table = [[0, -1, 0, 0],
-                [0, 1, 0, 0],
-                [0, 2, 0, 0],
-                [0, 3, 0, 0]]
+  test_table = [[0, 6, 0, 5],
+                [0, 1, 0, 2],
+                [0, 2, 3, 0],
+                [0, 3, 4, 0]]
 
   print(test_table)
+  print("----")
+  table = move_table(test_table,"right")
+  print("----")
+  print(test_table)
+
   # print(move_row_right(test_table,0,2))
   # print(move_row_left(test_table,0,0))
   # print(move_col_top(test_table,2,1))
-  print(move_col_down(test_table,2,1))
+  # print(move_col_down(test_table,2,1))
 
 
 
