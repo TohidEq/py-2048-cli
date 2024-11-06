@@ -58,28 +58,28 @@ def add_next_number(table:list,item:int):
 
 # moving cols(top and down) and rows(left and right) with an empty cells x,y only
 def move_col_top(table:list,y,x):
-  new_table = table;
+  new_table = table.copy()
   for i in range(y, TABLE_SIZE-1):
     new_table[i][x] = table[i+1][x]
   new_table[TABLE_SIZE-1][x]=0;
   return new_table
 
 def move_row_left(table:list,y,x):
-  new_table = table;
+  new_table = table.copy()
   for i in range(x, TABLE_SIZE-1):
     new_table[y][i] = table[y][i+1]
   new_table[y][TABLE_SIZE-1]=0;
   return new_table
 
 def move_col_down(table:list,y,x):
-  new_table = table;
+  new_table = table.copy()
   for i in range(y, 0, -1): # "-1" -> reversed
     new_table[i][x] = table[i-1][x]
   new_table[0][x]=0;
   return new_table
 
 def move_row_right(table:list,y,x):
-  new_table = table;
+  new_table = table.copy()
   for i in range(x, 0, -1): # "-1" -> reversed
     new_table[y][i] = table[y][i-1]
   new_table[y][0]=0;
@@ -113,35 +113,83 @@ def move_table_right(table:list):
     table = move_row_right(table, empty_cell["y"], empty_cell["x"])
   return table
 
+# sum cells in 4 directions
+def sum_to_top(table:list):
+  new_table=table.copy()
+  x = 0
+  while(x < TABLE_SIZE):
+    y = 0
+    while(y < TABLE_SIZE - 1): # "-1": NO LAST CELL
+      if new_table[y][x] != 0:# not empty
+        if new_table[y][x] == new_table[y+1][x]:
+          new_table[y][x] *= 2
+          new_table = move_col_top(new_table, y+1, x)
+          y -= 1
+      y += 1
+    x += 1
+  return new_table
+
+def sum_to_left(table:list):
+  new_table=table.copy()
+  y = 0
+  while(y < TABLE_SIZE):
+    x = 0
+    while(x < TABLE_SIZE - 1): # "-1": NO LAST CELL
+      if new_table[y][x] != 0: # not empty
+        if new_table[y][x] == new_table[y][x+1]:
+          new_table[y][x] *= 2
+          new_table = move_row_left(new_table, y, x+1)
+          x -= 1
+      x += 1
+    y += 1
+  return new_table
+
+def sum_to_down(table:list):
+  new_table=table.copy()
+  x = 0
+  while(x < TABLE_SIZE):
+    y = TABLE_SIZE - 1
+    while(y > 0): # "> 0": NO FIRST CELL
+      if new_table[y][x] != 0:# not empty
+        if new_table[y][x] == new_table[y-1][x]:
+          new_table[y][x] *= 2
+          new_table = move_col_down(new_table, y-1, x)
+          y += 1
+      y -= 1
+    x += 1
+  return new_table
+
 def sum_to_right(table:list):
+  new_table=table.copy()
   y = 0
   while(y < TABLE_SIZE):
     x = TABLE_SIZE - 1
-    while(x > 0):
-      if table[y][x] != 0: # not empty
-        if table[y][x] == table[y][x-1]:
-          table[y][x] += table[y][x-1]
-          table = move_row_right(table,y,x-1)
-          x = x + 1
-      x = x - 1
-    y = y + 1
-  return table
+    while(x > 0): # "> 0": NO FIRST CELL
+      if new_table[y][x] != 0: # not empty
+        if new_table[y][x] == new_table[y][x-1]:
+          new_table[y][x] *= 2
+          new_table = move_row_right(new_table, y, x-1)
+          x += 1
+      x -= 1
+    y += 1
+  return new_table
+
 
 
 
 
 def move_table(table:list, move:str):
-  new_table = table
+  new_table = table.copy()
   # move = top, left, down, right
   match move:
     case "top":
-      new_table = move_table_top(new_table)
+      new_table = sum_to_top(move_table_top(new_table))
     case "left":
-      new_table = move_table_left(new_table)
+      new_table = sum_to_left(move_table_left(new_table))
     case "down":
-      new_table = move_table_down(new_table)
+      new_table = sum_to_down(move_table_down(new_table))
     case "right":
-      new_table = move_table_right(new_table)
+      new_table = sum_to_right(move_table_right(new_table))
     case _:
       print("incorrect move")
 
@@ -165,34 +213,28 @@ def main():
                 [0, 2, 3, 0],
                 [5, 1, 4, 1]]
   p(test_table)
-  # p("-epmty-")
-  # p(get_empty_cells(test_table))
+  p("---")
 
-  # print("---- t")
-  # p(move_table_top([[0, 6, 0, 5],
-  #               [2, 0, 1, 0],
-  #               [0, 2, 3, 0],
-  #               [5, 1, 4, 1]]))
-  # print("---- l")
-  # p(move_table_left([[0, 6, 0, 5],
-  #               [2, 0, 1, 0],
-  #               [0, 2, 3, 0],
-  #               [5, 1, 4, 1]]))
-  # print("---- d")
-  # p(move_table_down([[0, 6, 0, 5],
-  #               [2, 0, 1, 0],
-  #               [0, 2, 3, 0],
-  #               [5, 1, 4, 1]]))
-  # print("---- r")
-  # p(move_table_right([[0, 6, 0, 5],
-  #               [2, 0, 1, 0],
-  #               [0, 2, 3, 0],
-  #               [5, 1, 4, 1]]))
-
-  p(sum_to_right([[2, 2, 2, 2],
+  p("t")
+  p(move_table([[2, 2, 2, 2],
                 [2, 0, 1, 0],
                 [0, 2, 3, 0],
-                [5, 1, 4, 1]]))
+                [5, 1, 4, 1]],"top"))
+  p("l")
+  p(move_table([[2, 2, 2, 2],
+                [2, 0, 1, 0],
+                [0, 2, 3, 0],
+                [5, 1, 4, 1]],"left"))
+  p("d")
+  p(move_table([[2, 2, 2, 2],
+                [2, 0, 1, 0],
+                [0, 2, 3, 0],
+                [5, 1, 4, 1]],"down"))
+  p("")
+  p(move_table([[2, 2, 2, 2],
+                [2, 0, 1, 0],
+                [0, 2, 3, 0],
+                [5, 1, 4, 1]],"right"))
 
   # print(move_row_right(test_table,0,2))
   # print(move_row_left(test_table,0,0))
