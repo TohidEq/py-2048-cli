@@ -78,7 +78,6 @@ def move_col_down(table:list,y,x):
   new_table[0][x]=0;
   return new_table
 
-
 def move_row_right(table:list,y,x):
   new_table = table;
   for i in range(x, 0, -1): # "-1" -> reversed
@@ -86,6 +85,8 @@ def move_row_right(table:list,y,x):
   new_table[y][0]=0;
   return new_table
 
+
+# moving table in 4 directions (top, left, down, right)
 def move_table_top(table:list):
   empty_cells = get_empty_cells(table)
   empty_cells.reverse()
@@ -111,6 +112,21 @@ def move_table_right(table:list):
   for empty_cell in empty_cells:
     table = move_row_right(table, empty_cell["y"], empty_cell["x"])
   return table
+
+def sum_to_right(table:list):
+  y = 0
+  while(y < TABLE_SIZE):
+    x = TABLE_SIZE - 1
+    while(x > 0):
+      if table[y][x] != 0: # not empty
+        if table[y][x] == table[y][x-1]:
+          table[y][x] += table[y][x-1]
+          table = move_row_right(table,y,x-1)
+          x = x + 1
+      x = x - 1
+    y = y + 1
+  return table
+
 
 
 
@@ -144,31 +160,36 @@ def main():
   # print(get_empty_cells(game_table))
   # print(get_random_cell(get_empty_cells(game_table)))
 
-  test_table = [[0, 6, 0, 5],
+  test_table = [[2, 2, 2, 2],
                 [2, 0, 1, 0],
                 [0, 2, 3, 0],
                 [5, 1, 4, 1]]
   p(test_table)
-  p("-epmty-")
-  p(get_empty_cells(test_table))
+  # p("-epmty-")
+  # p(get_empty_cells(test_table))
 
-  print("---- t")
-  p(move_table_top([[0, 6, 0, 5],
-                [2, 0, 1, 0],
-                [0, 2, 3, 0],
-                [5, 1, 4, 1]]))
-  print("---- l")
-  p(move_table_left([[0, 6, 0, 5],
-                [2, 0, 1, 0],
-                [0, 2, 3, 0],
-                [5, 1, 4, 1]]))
-  print("---- d")
-  p(move_table_down([[0, 6, 0, 5],
-                [2, 0, 1, 0],
-                [0, 2, 3, 0],
-                [5, 1, 4, 1]]))
-  print("---- r")
-  p(move_table_right([[0, 6, 0, 5],
+  # print("---- t")
+  # p(move_table_top([[0, 6, 0, 5],
+  #               [2, 0, 1, 0],
+  #               [0, 2, 3, 0],
+  #               [5, 1, 4, 1]]))
+  # print("---- l")
+  # p(move_table_left([[0, 6, 0, 5],
+  #               [2, 0, 1, 0],
+  #               [0, 2, 3, 0],
+  #               [5, 1, 4, 1]]))
+  # print("---- d")
+  # p(move_table_down([[0, 6, 0, 5],
+  #               [2, 0, 1, 0],
+  #               [0, 2, 3, 0],
+  #               [5, 1, 4, 1]]))
+  # print("---- r")
+  # p(move_table_right([[0, 6, 0, 5],
+  #               [2, 0, 1, 0],
+  #               [0, 2, 3, 0],
+  #               [5, 1, 4, 1]]))
+
+  p(sum_to_right([[2, 2, 2, 2],
                 [2, 0, 1, 0],
                 [0, 2, 3, 0],
                 [5, 1, 4, 1]]))
