@@ -19,6 +19,92 @@ KEYS_MOVES = {
   "L":"right",
 }
 
+# numbers (y,x):(7,3)
+NUMBERS = (
+  [[1,1,1],
+  [1,0,1],
+  [1,0,1],
+  [1,0,1],
+  [1,0,1],
+  [1,0,1],
+  [1,1,1]],
+
+  [[0,1,0],
+  [0,1,0],
+  [0,1,0],
+  [0,1,0],
+  [0,1,0],
+  [0,1,0],
+  [0,1,0]],
+
+  [[1,1,1],
+  [1,0,1],
+  [0,0,1],
+  [1,1,1],
+  [1,0,0],
+  [1,0,0],
+  [1,1,1]],
+
+  [[1,1,1],
+  [0,0,1],
+  [0,0,1],
+  [1,1,1],
+  [0,0,1],
+  [0,0,1],
+  [1,1,1]],
+
+  [[1,0,1],
+  [1,0,1],
+  [1,0,1],
+  [1,1,1],
+  [0,0,1],
+  [0,0,1],
+  [0,0,1]],
+
+  [[1,1,1],
+  [1,0,0],
+  [1,0,0],
+  [1,1,1],
+  [0,0,1],
+  [1,0,1],
+  [1,1,1]],
+
+  [[1,1,1],
+  [1,0,0],
+  [1,0,0],
+  [1,1,1],
+  [1,0,1],
+  [1,0,1],
+  [1,1,1]],
+
+  [[1,1,1],
+  [0,0,1],
+  [0,0,1],
+  [0,0,1],
+  [0,0,1],
+  [0,0,1],
+  [0,0,1]],
+
+  [[1,1,1],
+  [1,0,1],
+  [1,0,1],
+  [1,1,1],
+  [1,0,1],
+  [1,0,1],
+  [1,1,1]],
+
+  [[1,1,1],
+  [1,0,1],
+  [1,0,1],
+  [1,1,1],
+  [0,0,1],
+  [0,0,1],
+  [1,1,1]]
+)
+
+
+# 31 * 13
+
 
 # funcs
 def new_empty_table(table_size):
@@ -58,28 +144,28 @@ def add_next_number(table:list,item:int):
 
 # moving cols(top and down) and rows(left and right) with an empty cells x,y only
 def move_col_top(table:list,y,x):
-  new_table = table.copy()
+  new_table = table[:]
   for i in range(y, TABLE_SIZE-1):
     new_table[i][x] = table[i+1][x]
   new_table[TABLE_SIZE-1][x]=0;
   return new_table
 
 def move_row_left(table:list,y,x):
-  new_table = table.copy()
+  new_table = table[:]
   for i in range(x, TABLE_SIZE-1):
     new_table[y][i] = table[y][i+1]
   new_table[y][TABLE_SIZE-1]=0;
   return new_table
 
 def move_col_down(table:list,y,x):
-  new_table = table.copy()
+  new_table = table[:]
   for i in range(y, 0, -1): # "-1" -> reversed
     new_table[i][x] = table[i-1][x]
   new_table[0][x]=0;
   return new_table
 
 def move_row_right(table:list,y,x):
-  new_table = table.copy()
+  new_table = table[:]
   for i in range(x, 0, -1): # "-1" -> reversed
     new_table[y][i] = table[y][i-1]
   new_table[y][0]=0;
@@ -115,7 +201,7 @@ def move_table_right(table:list):
 
 # sum cells in 4 directions
 def sum_to_top(table:list):
-  new_table=table.copy()
+  new_table = table[:]
   x = 0
   while(x < TABLE_SIZE):
     y = 0
@@ -130,7 +216,7 @@ def sum_to_top(table:list):
   return new_table
 
 def sum_to_left(table:list):
-  new_table=table.copy()
+  new_table = table[:]
   y = 0
   while(y < TABLE_SIZE):
     x = 0
@@ -145,7 +231,7 @@ def sum_to_left(table:list):
   return new_table
 
 def sum_to_down(table:list):
-  new_table=table.copy()
+  new_table = table[:]
   x = 0
   while(x < TABLE_SIZE):
     y = TABLE_SIZE - 1
@@ -160,7 +246,7 @@ def sum_to_down(table:list):
   return new_table
 
 def sum_to_right(table:list):
-  new_table=table.copy()
+  new_table = table[:]
   y = 0
   while(y < TABLE_SIZE):
     x = TABLE_SIZE - 1
@@ -179,7 +265,7 @@ def sum_to_right(table:list):
 
 
 def move_table(table:list, move:str):
-  new_table = table.copy()
+  new_table = table[:]
   # move = top, left, down, right
   match move:
     case "top":
@@ -192,7 +278,7 @@ def move_table(table:list, move:str):
       new_table = sum_to_right(move_table_right(new_table))
     case _:
       print("incorrect move")
-
+  # print(table==new_table)
 
   return new_table;
 
@@ -235,7 +321,7 @@ def main():
                 [2, 0, 1, 0],
                 [0, 2, 3, 0],
                 [5, 1, 4, 1]],"right"))
-
+  print(test_table==move_table(test_table,"top"))
   # print(move_row_right(test_table,0,2))
   # print(move_row_left(test_table,0,0))
   # print(move_col_top(test_table,2,1))
