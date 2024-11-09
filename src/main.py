@@ -1,11 +1,22 @@
-# from blessed import Terminal
+from blessed import Terminal
 import random
+
+
+
+
+# for see result in better style
+from pprint import pprint
+def p(t):
+  pprint(t,width=20, compact=True)
+
+
 
 # config:
 TABLE_SIZE = 4
-NEXT_ITEM = 2 # after every correct move will add one "2" in table
+
+# pls write items in order lowest to highest chance (sum of chances must be 100)
 # ------------[ [item, chance of item], ...]
-# NEXT_ITEMS = [[2, 90], [4, 10]]
+NEXT_ITEMS = [[4, 10], [2, 90]]
 KEYS_MOVES = {
   # WASD mode:
   "W":"top",
@@ -102,13 +113,29 @@ NUMBERS = (
   [1,1,1]]
 )
 
-
-# 31 * 13
+# blessed confs
+# - cells:
+CELL_PADDING_Y = 3 # padding (top and bottom) cells
+CELL_PADDING_X = 1 # padding (left and right) cells
+CELL_MAX_NUMBER_LENGTH = 7 # max numbers(length) in a cell
+CELL_SIZE_Y = len(NUMBERS[0]) + (CELL_PADDING_Y * 2)
+CELL_SIZE_x = (len(NUMBERS[0][0]) * CELL_MAX_NUMBER_LENGTH) + (CELL_PADDING_X * 2)
+CELL_EMPTY_CHAR = " "
+CELL_FILL_CHAR = "█"
+CELL_GAP_CHAR = "█"
+# - window:
+WINDOW_PADDING_Y = 1
+WINDOW_PADDING_X = 2
+WINDOW_MARGIN_Y = 1
+WINDOW_MARGIN_X = 2
+WINDOW_WALL_CHAR = "█"
+WINDOW_MARGIN_CHAR = " "
 
 
 # funcs
+# - cells funcs:
 def new_empty_table(table_size):
-  table = [[0]*table_size]*table_size
+  table = [[0]*table_size for _ in range(table_size+1)]
   return table
 
 # returns list [ {"y":y1,"x":x1} , {"y":y2,"x":x2} , ... ] of empty cells
@@ -128,17 +155,29 @@ def get_empty_cells(table:list):
 
 def get_random_cell(cells:list):
   cells_count = len(cells)
-  random_index = random.randint(0,cells_count)
+  random_index = random.randint(0,cells_count-1)
   random_cell = cells[random_index]
   return random_cell
 
 
+def choose_random_item():
+  random_number = random.randrange(0,100 + 1)
+  minimum = 0
+  for item in NEXT_ITEMS:
+    maximum = item[1] + minimum
+    if (minimum <= random_number <= maximum):
+      return item[0]
+    minimum = maximum
+  return 0
 
 # add an item to table after played a correct move
-def add_next_number(table:list,item:int):
+def add_next_number(table:list,item:int=choose_random_item()):
   empty_cells = get_empty_cells(table)
   random_cell = get_random_cell(empty_cells)
-  table[random_cell[0]][random_cell[1]] = item
+  y = random_cell["y"]
+  x = random_cell["x"]
+
+  table[y][x]=item
   return table
 
 
@@ -266,6 +305,7 @@ def sum_to_right(table:list):
 
 def move_table(table:list, move:str):
   new_table = table[:]
+
   # move = top, left, down, right
   match move:
     case "top":
@@ -276,56 +316,27 @@ def move_table(table:list, move:str):
       new_table = sum_to_down(move_table_down(new_table))
     case "right":
       new_table = sum_to_right(move_table_right(new_table))
-    case _:
-      print("incorrect move")
-  # print(table==new_table)
+    # case _:
+    #   print("incorrect move")
 
   return new_table;
 
 
-# for see result in better style
-from pprint import pprint
-def p(t):
-  pprint(t,width=20, compact=True)
+
+
+# - widnow funcs:
+# def
+
+
 
 def main():
-  # game_table = new_empty_table(TABLE_SIZE)
-  # print(game_table)
-  # print(get_empty_cells(game_table))
-  # print(get_random_cell(get_empty_cells(game_table)))
+  game_table = new_empty_table(TABLE_SIZE)
+  # window = Terminal()
+  p(game_table)
 
-  test_table = [[2, 2, 2, 2],
-                [2, 0, 1, 0],
-                [0, 2, 3, 0],
-                [5, 1, 4, 1]]
-  p(test_table)
-  p("---")
+  game_table = add_next_number(game_table)
+  p(game_table)
 
-  p("t")
-  p(move_table([[2, 2, 2, 2],
-                [2, 0, 1, 0],
-                [0, 2, 3, 0],
-                [5, 1, 4, 1]],"top"))
-  p("l")
-  p(move_table([[2, 2, 2, 2],
-                [2, 0, 1, 0],
-                [0, 2, 3, 0],
-                [5, 1, 4, 1]],"left"))
-  p("d")
-  p(move_table([[2, 2, 2, 2],
-                [2, 0, 1, 0],
-                [0, 2, 3, 0],
-                [5, 1, 4, 1]],"down"))
-  p("")
-  p(move_table([[2, 2, 2, 2],
-                [2, 0, 1, 0],
-                [0, 2, 3, 0],
-                [5, 1, 4, 1]],"right"))
-  print(test_table==move_table(test_table,"top"))
-  # print(move_row_right(test_table,0,2))
-  # print(move_row_left(test_table,0,0))
-  # print(move_col_top(test_table,2,1))
-  # print(move_col_down(test_table,2,1))
 
 
 
