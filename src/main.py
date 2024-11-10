@@ -32,11 +32,9 @@ KEYS_MOVES = {
   "L":"right",
 }
 
-# numbers (y,x):(7,3)
+# numbers (y,x):(5,3)
 NUMBERS = (
   [[1,1,1],
-  [1,0,1],
-  [1,0,1],
   [1,0,1],
   [1,0,1],
   [1,0,1],
@@ -46,53 +44,39 @@ NUMBERS = (
   [0,1,0],
   [0,1,0],
   [0,1,0],
-  [0,1,0],
-  [0,1,0],
   [0,1,0]],
 
   [[1,1,1],
-  [1,0,1],
   [0,0,1],
   [1,1,1],
-  [1,0,0],
   [1,0,0],
   [1,1,1]],
 
   [[1,1,1],
   [0,0,1],
-  [0,0,1],
   [1,1,1],
-  [0,0,1],
   [0,0,1],
   [1,1,1]],
 
   [[1,0,1],
   [1,0,1],
-  [1,0,1],
   [1,1,1],
-  [0,0,1],
   [0,0,1],
   [0,0,1]],
 
   [[1,1,1],
   [1,0,0],
-  [1,0,0],
   [1,1,1],
   [0,0,1],
-  [1,0,1],
   [1,1,1]],
 
   [[1,1,1],
   [1,0,0],
-  [1,0,0],
   [1,1,1],
-  [1,0,1],
   [1,0,1],
   [1,1,1]],
 
   [[1,1,1],
-  [0,0,1],
-  [0,0,1],
   [0,0,1],
   [0,0,1],
   [0,0,1],
@@ -100,26 +84,38 @@ NUMBERS = (
 
   [[1,1,1],
   [1,0,1],
-  [1,0,1],
   [1,1,1],
-  [1,0,1],
   [1,0,1],
   [1,1,1]],
 
   [[1,1,1],
   [1,0,1],
-  [1,0,1],
   [1,1,1],
-  [0,0,1],
   [0,0,1],
   [1,1,1]]
 )
+
+COLOR_EMPTY = (204, 192, 179);
+COLOR_2 = (238, 228, 218);
+COLOR_4 = (237, 224, 200);
+COLOR_8 = (242, 177, 121);
+COLOR_16 = (245, 149, 99);
+COLOR_32 = (246, 124, 95);
+COLOR_64 = (246, 94, 59);
+COLOR_128 = (237, 207, 114);
+COLOR_256 = (237, 204, 97);
+COLOR_512 = (237, 200, 80);
+COLOR_1024 = (237, 197, 63);
+COLOR_2048 = (237, 194, 46);
+COLOR_OTHER = (0, 0, 0);
+
+
 
 # blessed confs
 # - cells:
 CELL_PADDING_Y = 3 # padding (top and bottom) cells
 CELL_PADDING_X = 1 # padding (left and right) cells
-CELL_MAX_NUMBER_LENGTH = 7 # max numbers(length) in a cell
+CELL_MAX_NUMBER_LENGTH = 5 # max numbers(length) in a cell
 CELL_SIZE_Y = len(NUMBERS[0]) + (CELL_PADDING_Y * 2)
 CELL_SIZE_x = (len(NUMBERS[0][0]) * CELL_MAX_NUMBER_LENGTH) + (CELL_PADDING_X * 2)
 CELL_EMPTY_CHAR = " " # zeroes in NUMBERS
@@ -131,6 +127,7 @@ WINDOW_PADDING_X = 2
 WINDOW_BORDER_Y = 1
 WINDOW_BORDER_X = 2
 WINDOW_WALL_CHAR = "█"
+WINDOW_WALL_COLOR = (153, 51, 0) # RGB
 WINDOW_PADDING_CHAR = " "
 WINDOW_SCORE_TEXT = "SCORE: "
 WINDOW_SCORE_POS_Y = 1
@@ -334,19 +331,33 @@ def move_table(table:list, move:str):
 
 # - widnow funcs:
 def draw_border(term):
-  # for y in range(int(max_y)):
-  #   if y < (WINDOW_BORDER_Y) or y > (max_y-WINDOW_BORDER_Y):
   border_y = (WINDOW_WALL_CHAR * term.width)
+  # text color
+  color = term.color_rgb(WINDOW_WALL_COLOR[0],
+                          WINDOW_WALL_COLOR[1],
+                          WINDOW_WALL_COLOR[2])
+  ## bg color
+  # on_color = term.color_rgb(255 - WINDOW_WALL_COLOR[0],
+  #                         255 - WINDOW_WALL_COLOR[1],
+  #                         255 - WINDOW_WALL_COLOR[2])
+
   for y in range(WINDOW_BORDER_Y):
-    print(term.move_xy(0,y)+f'{border_y}{term.normal}',end='')
-    print(term.move_xy(0, term.height-1-y)+f'{border_y}{term.normal}',end='')
+    # top border
+    print(term.move_xy(0,y)+color+f'{border_y}{term.normal}',end='')
+    # bottom border
+    print(term.move_xy(0, term.height-1-y)+color+f'{border_y}{term.normal}',end='')
 
   border_x = (WINDOW_WALL_CHAR * WINDOW_BORDER_X)
   for y in range(term.height):
-    print(term.move_xy(0, y)+f'{border_x}{term.normal}',end='')
-    print(term.move_xy(term.width-WINDOW_BORDER_X, y)+f'{border_x}{term.normal}',end='')
+    # left border
+    print(term.move_xy(0, y)+color+f'{border_x}{term.normal}',end='')
+    # right border
+    print(term.move_xy(term.width-WINDOW_BORDER_X, y)+color+f'{border_x}{term.normal}',end='')
 
-  print(term.move_xy(0,0))
+
+
+
+
 
 
 
