@@ -1,6 +1,9 @@
 from blessed import Terminal
 import random
+import copy
 
+# to clear screen for demo game cli
+import os
 
 
 
@@ -135,7 +138,7 @@ WINDOW_MARGIN_CHAR = " "
 # funcs
 # - cells funcs:
 def new_empty_table(table_size):
-  table = [[0]*table_size for _ in range(table_size+1)]
+  table = [[0]*table_size for _ in range(table_size)]
   return table
 
 # returns list [ {"y":y1,"x":x1} , {"y":y2,"x":x2} , ... ] of empty cells
@@ -183,28 +186,28 @@ def add_next_number(table:list,item:int=choose_random_item()):
 
 # moving cols(top and down) and rows(left and right) with an empty cells x,y only
 def move_col_top(table:list,y,x):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
   for i in range(y, TABLE_SIZE-1):
     new_table[i][x] = table[i+1][x]
   new_table[TABLE_SIZE-1][x]=0;
   return new_table
 
 def move_row_left(table:list,y,x):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
   for i in range(x, TABLE_SIZE-1):
     new_table[y][i] = table[y][i+1]
   new_table[y][TABLE_SIZE-1]=0;
   return new_table
 
 def move_col_down(table:list,y,x):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
   for i in range(y, 0, -1): # "-1" -> reversed
     new_table[i][x] = table[i-1][x]
   new_table[0][x]=0;
   return new_table
 
 def move_row_right(table:list,y,x):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
   for i in range(x, 0, -1): # "-1" -> reversed
     new_table[y][i] = table[y][i-1]
   new_table[y][0]=0;
@@ -240,7 +243,7 @@ def move_table_right(table:list):
 
 # sum cells in 4 directions
 def sum_to_top(table:list):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
   x = 0
   while(x < TABLE_SIZE):
     y = 0
@@ -255,7 +258,7 @@ def sum_to_top(table:list):
   return new_table
 
 def sum_to_left(table:list):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
   y = 0
   while(y < TABLE_SIZE):
     x = 0
@@ -270,7 +273,7 @@ def sum_to_left(table:list):
   return new_table
 
 def sum_to_down(table:list):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
   x = 0
   while(x < TABLE_SIZE):
     y = TABLE_SIZE - 1
@@ -285,7 +288,7 @@ def sum_to_down(table:list):
   return new_table
 
 def sum_to_right(table:list):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
   y = 0
   while(y < TABLE_SIZE):
     x = TABLE_SIZE - 1
@@ -304,7 +307,7 @@ def sum_to_right(table:list):
 
 
 def move_table(table:list, move:str):
-  new_table = table[:]
+  new_table = copy.deepcopy(table)
 
   # move = top, left, down, right
   match move:
@@ -318,7 +321,9 @@ def move_table(table:list, move:str):
       new_table = sum_to_right(move_table_right(new_table))
     # case _:
     #   print("incorrect move")
-
+  if (table != new_table):
+    # TODO: increase score here
+    new_table = add_next_number(table=new_table);
   return new_table;
 
 
@@ -327,15 +332,41 @@ def move_table(table:list, move:str):
 # - widnow funcs:
 # def
 
+def clear():
+    # for windows
+    if os.name == 'nt':
+        _ = os.system('cls')
 
+    # for mac and linux(here, os.name is 'posix')
+    else:
+        _ = os.system('clear')
 
 def main():
   game_table = new_empty_table(TABLE_SIZE)
+  game_table = add_next_number(table=game_table)
+  game_table = add_next_number(table=game_table)
+
   # window = Terminal()
   p(game_table)
 
-  game_table = add_next_number(game_table)
-  p(game_table)
+  x = input("(wasd, q) >> ")
+  while(x != "q"):
+    # clear screen
+    clear()
+
+    match x:
+      case "w":
+        game_table=move_table(table=game_table,move="top")
+      case "a":
+        game_table=move_table(table=game_table,move="left")
+      case "s":
+        game_table=move_table(table=game_table,move="down")
+      case "d":
+        game_table=move_table(table=game_table,move="right")
+
+    p(game_table)
+
+    x = input(">> ")
 
 
 
