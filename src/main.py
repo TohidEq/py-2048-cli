@@ -108,7 +108,20 @@ COLOR_512 = (237, 200, 80);
 COLOR_1024 = (237, 197, 63);
 COLOR_2048 = (237, 194, 46);
 COLOR_OTHER = (0, 0, 0);
-
+COLORS = {"0":COLOR_EMPTY,
+          "2":COLOR_2,
+          "4":COLOR_4,
+          "8":COLOR_8,
+          "16":COLOR_16,
+          "32":COLOR_32,
+          "64":COLOR_64,
+          "128":COLOR_128,
+          "256":COLOR_256,
+          "512":COLOR_512,
+          "1024":COLOR_1024,
+          "2048":COLOR_2048,
+          "999999":COLOR_OTHER
+          }
 
 
 # blessed confs
