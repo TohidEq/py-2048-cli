@@ -2,15 +2,14 @@ from blessed import Terminal
 import random
 import copy
 
-# to clear screen for demo game cli
-import os
 
 
 
-# for see result in better style
-from pprint import pprint
-def p(t):
-  pprint(t,width=20, compact=True)
+
+## for see result in better style
+# from pprint import pprint
+# def p(t):
+#   pprint(t,width=20, compact=True)
 
 
 
@@ -123,17 +122,21 @@ CELL_PADDING_X = 1 # padding (left and right) cells
 CELL_MAX_NUMBER_LENGTH = 7 # max numbers(length) in a cell
 CELL_SIZE_Y = len(NUMBERS[0]) + (CELL_PADDING_Y * 2)
 CELL_SIZE_x = (len(NUMBERS[0][0]) * CELL_MAX_NUMBER_LENGTH) + (CELL_PADDING_X * 2)
-CELL_EMPTY_CHAR = " "
-CELL_FILL_CHAR = "█"
-CELL_GAP_CHAR = "█"
+CELL_EMPTY_CHAR = " " # zeroes in NUMBERS
+CELL_FILL_CHAR = "█" # ones in NUMBERS
+CELL_GAP_CHAR = "█" # between cells
 # - window:
 WINDOW_PADDING_Y = 1
 WINDOW_PADDING_X = 2
-WINDOW_MARGIN_Y = 1
-WINDOW_MARGIN_X = 2
+WINDOW_BORDER_Y = 1
+WINDOW_BORDER_X = 2
 WINDOW_WALL_CHAR = "█"
-WINDOW_MARGIN_CHAR = " "
-
+WINDOW_PADDING_CHAR = " "
+WINDOW_SCORE_TEXT = "SCORE: "
+WINDOW_SCORE_POS_Y = 1
+WINDOW_SCORE_POS_X = 3
+WINDOW_GOODBYE_TITLE = "Goodbye :D"
+WINDOW_GOODBYE_TEXT = "Press any key to exit or w8 3s"
 
 # funcs
 # - cells funcs:
@@ -319,8 +322,8 @@ def move_table(table:list, move:str):
       new_table = sum_to_down(move_table_down(new_table))
     case "right":
       new_table = sum_to_right(move_table_right(new_table))
-    # case _:
-    #   print("incorrect move")
+
+  # if table has been changed then we add next number and increase score
   if (table != new_table):
     # TODO: increase score here
     new_table = add_next_number(table=new_table);
@@ -330,43 +333,54 @@ def move_table(table:list, move:str):
 
 
 # - widnow funcs:
-# def
+def draw_border(term):
+  # for y in range(int(max_y)):
+  #   if y < (WINDOW_BORDER_Y) or y > (max_y-WINDOW_BORDER_Y):
+  border_y = (WINDOW_WALL_CHAR * term.width)
+  for y in range(WINDOW_BORDER_Y):
+    print(term.move_xy(0,y)+f'{border_y}{term.normal}',end='')
+    print(term.move_xy(0, term.height-1-y)+f'{border_y}{term.normal}',end='')
 
-def clear():
-    # for windows
-    if os.name == 'nt':
-        _ = os.system('cls')
+  border_x = (WINDOW_WALL_CHAR * WINDOW_BORDER_X)
+  for y in range(term.height):
+    print(term.move_xy(0, y)+f'{border_x}{term.normal}',end='')
+    print(term.move_xy(term.width-WINDOW_BORDER_X, y)+f'{border_x}{term.normal}',end='')
 
-    # for mac and linux(here, os.name is 'posix')
-    else:
-        _ = os.system('clear')
+  print(term.move_xy(0,0))
+
+
+
 
 def main():
   game_table = new_empty_table(TABLE_SIZE)
   game_table = add_next_number(table=game_table)
   game_table = add_next_number(table=game_table)
+  # p(game_table)
 
-  # window = Terminal()
-  p(game_table)
+  term = Terminal()
 
-  x = input("(wasd, q) >> ")
-  while(x != "q"):
-    # clear screen
-    clear()
 
-    match x:
-      case "w":
-        game_table=move_table(table=game_table,move="top")
-      case "a":
-        game_table=move_table(table=game_table,move="left")
-      case "s":
-        game_table=move_table(table=game_table,move="down")
-      case "d":
-        game_table=move_table(table=game_table,move="right")
+  print(term.clear)
+  draw_border(term)
+  input()
 
-    p(game_table)
+  with term.fullscreen(), term.cbreak(), term.hidden_cursor():
+    key = ''
+    while key.lower() != 'q':
+      key = term.inkey(timeout=1)
+      if key:
+        print("key pressed: {0}".format(key))
 
-    x = input(">> ")
+
+
+    print(term.clear)
+
+    print(term.move_xy(term.width//2 - (len(WINDOW_GOODBYE_TITLE)//2), term.height//2 - 1)+term.bold(f'{WINDOW_GOODBYE_TITLE}{term.normal}'))
+    print(term.move_xy(term.width//2 - (len(WINDOW_GOODBYE_TEXT)//2), term.height//2 + 1)+term.bold(f'{WINDOW_GOODBYE_TEXT}{term.normal}'))
+    term.inkey(timeout=3)
+  # clear screen after end game
+  print(term.clear)
+
 
 
 
