@@ -7,9 +7,9 @@ import copy
 
 
 ## for see result in better style
-# from pprint import pprint
-# def p(t):
-#   pprint(t,width=20, compact=True)
+from pprint import pprint
+def p(t):
+  pprint(t,width=20, compact=True)
 
 
 
@@ -254,6 +254,7 @@ def move_table_right(table:list):
     table = move_row_right(table, empty_cell["y"], empty_cell["x"])
   return table
 
+
 # sum cells in 4 directions
 def sum_to_top(table:list):
   new_table = copy.deepcopy(table)
@@ -265,7 +266,6 @@ def sum_to_top(table:list):
         if new_table[y][x] == new_table[y+1][x]:
           new_table[y][x] *= 2
           new_table = move_col_top(new_table, y+1, x)
-          y -= 1
       y += 1
     x += 1
   return new_table
@@ -280,7 +280,6 @@ def sum_to_left(table:list):
         if new_table[y][x] == new_table[y][x+1]:
           new_table[y][x] *= 2
           new_table = move_row_left(new_table, y, x+1)
-          x -= 1
       x += 1
     y += 1
   return new_table
@@ -295,7 +294,6 @@ def sum_to_down(table:list):
         if new_table[y][x] == new_table[y-1][x]:
           new_table[y][x] *= 2
           new_table = move_col_down(new_table, y-1, x)
-          y += 1
       y -= 1
     x += 1
   return new_table
@@ -310,7 +308,6 @@ def sum_to_right(table:list):
         if new_table[y][x] == new_table[y][x-1]:
           new_table[y][x] *= 2
           new_table = move_row_right(new_table, y, x-1)
-          x += 1
       x -= 1
     y += 1
   return new_table
@@ -381,6 +378,16 @@ def main():
   game_table = add_next_number(table=game_table)
   # p(game_table)
 
+  game_table=[[2,2,4,4],
+              [2,2,4,0],
+              [2,2,0,4],
+              [4,4,8,16]
+              ]
+  p(game_table)
+  game_table = move_table(game_table,"left")
+  p(game_table)
+
+  """
   term = Terminal()
 
 
@@ -405,6 +412,7 @@ def main():
   # clear screen after end game
   print(term.clear)
 
+  """
 
 
 
