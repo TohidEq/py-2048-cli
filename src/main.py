@@ -430,8 +430,14 @@ def draw_number_in_cell(term, number, cell_pos_y, cell_pos_x):
                 + term.normal)
     left_start += len(NUMBERS[0][0])+1
 
+def draw_table(term,table):
+  draw_empty_table(term=term,table=table)
 
-
+  for y in range(TABLE_SIZE):
+    for x in range(TABLE_SIZE):
+      number = table[y][x]
+      if(number != 0):
+        draw_number_in_cell(term=term,number=number,cell_pos_y=y,cell_pos_x=x)
 
 
 
@@ -455,19 +461,26 @@ def main():
 
 
   print(term.clear)
-  draw_border(term)
-  draw_empty_table(term=term,table=game_table)
-  draw_number_in_cell(term=term,number=12,cell_pos_y=0,cell_pos_x=0)
-  draw_number_in_cell(term=term,number=2048,cell_pos_y=1,cell_pos_x=0)
-  draw_number_in_cell(term=term,number=4096,cell_pos_y=1,cell_pos_x=1)
-  input()
+  # draw_border(term)
+  # draw_table(term=term, table=game_table)
+  # input()
 
   with term.fullscreen(), term.cbreak(), term.hidden_cursor():
     key = ''
     while key.lower() != 'q':
+
+      draw_border(term)
+      draw_table(term=term, table=game_table)
+
+
       key = term.inkey(timeout=1)
       if key:
-        print("key pressed: {0}".format(key))
+        # print("key pressed: {0}".format(key))
+        # move_table
+        key = key.upper()
+        if key in KEYS_MOVES:
+          game_table=move_table(table=game_table, move=KEYS_MOVES[key])
+
 
 
 
