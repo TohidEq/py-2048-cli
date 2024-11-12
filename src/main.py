@@ -7,9 +7,9 @@ import copy
 
 
 ## for see result in better style
-from pprint import pprint
-def p(t):
-  pprint(t,width=20, compact=True)
+# from pprint import pprint
+# def p(t):
+#   pprint(t,width=20, compact=True)
 
 
 
@@ -126,12 +126,14 @@ COLORS = {"0":COLOR_EMPTY,
 
 # blessed confs
 # - cells:
-CELL_PADDING_Y = 3 # padding (top and bottom) cells
+CELL_PADDING_Y = 1 # padding (top and bottom) cells
 CELL_PADDING_X = 1 # padding (left and right) cells
-CELL_MAX_NUMBER_LENGTH = 5 # max numbers(length) in a cell
+CELL_GAP_Y = 1
+CELL_GAP_X = 2
+CELL_MAX_NUMBER_LENGTH = 6 # max numbers(length) in a cell
 CELL_SIZE_Y = len(NUMBERS[0]) + (CELL_PADDING_Y * 2)
 CELL_SIZE_x = (len(NUMBERS[0][0]) * CELL_MAX_NUMBER_LENGTH) + (CELL_PADDING_X * 2)
-CELL_EMPTY_CHAR = " " # zeroes in NUMBERS
+CELL_EMPTY_CHAR = "█" # zeroes in NUMBERS
 CELL_FILL_CHAR = "█" # ones in NUMBERS
 CELL_GAP_CHAR = "█" # between cells
 # - window:
@@ -364,6 +366,16 @@ def draw_border(term):
     # right border
     print(term.move_xy(term.width-WINDOW_BORDER_X, y)+color+f'{border_x}{term.normal}',end='')
 
+def draw_empty_cell(term, y_pos, x_pos):
+  row = (CELL_EMPTY_CHAR*CELL_PADDING_X)+CELL_EMPTY_CHAR*CELL_SIZE_x+(CELL_EMPTY_CHAR*CELL_PADDING_X)
+  col = CELL_SIZE_Y+(CELL_PADDING_Y*2)
+
+  left_start = WINDOW_BORDER_X + WINDOW_PADDING_X +(x_pos*len(row))+(x_pos*CELL_GAP_X)
+  top_start = WINDOW_BORDER_Y + WINDOW_PADDING_Y +(y_pos*col)+(y_pos*CELL_GAP_Y)
+  color = term.color_rgb(COLORS["0"][0], COLORS["0"][1], COLORS["0"][2])
+  for y in range(col):
+    print(term.move_xy(x=left_start+0, y=top_start+y)+ (row)+ term.normal)
+
 
 
 
@@ -378,21 +390,15 @@ def main():
   game_table = add_next_number(table=game_table)
   # p(game_table)
 
-  game_table=[[2,2,4,4],
-              [2,2,4,0],
-              [2,2,0,4],
-              [4,4,8,16]
-              ]
-  p(game_table)
-  game_table = move_table(game_table,"left")
-  p(game_table)
-
-  """
   term = Terminal()
 
 
   print(term.clear)
   draw_border(term)
+  draw_empty_cell(term=term,y_pos=0,x_pos=0)
+  draw_empty_cell(term=term,y_pos=1,x_pos=1)
+  draw_empty_cell(term=term,y_pos=1,x_pos=0)
+  draw_empty_cell(term=term,y_pos=2,x_pos=1)
   input()
 
   with term.fullscreen(), term.cbreak(), term.hidden_cursor():
@@ -412,7 +418,6 @@ def main():
   # clear screen after end game
   print(term.clear)
 
-  """
 
 
 
