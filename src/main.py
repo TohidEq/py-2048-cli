@@ -107,7 +107,7 @@ COLOR_256 = (237, 204, 97);
 COLOR_512 = (237, 200, 80);
 COLOR_1024 = (237, 197, 63);
 COLOR_2048 = (237, 194, 46);
-COLOR_OTHER = (0, 0, 0);
+COLOR_OTHER = (80, 80, 80);
 COLORS = {"0":COLOR_EMPTY,
           "2":COLOR_2,
           "4":COLOR_4,
@@ -122,6 +122,10 @@ COLORS = {"0":COLOR_EMPTY,
           "2048":COLOR_2048,
           "999999":COLOR_OTHER
           }
+COLORS_FILL = {
+  "2048":(0,0,0),
+  "999999":(255,255,255),
+}
 
 
 # blessed confs
@@ -132,7 +136,7 @@ CELL_GAP_Y = 1
 CELL_GAP_X = 2
 CELL_MAX_NUMBER_LENGTH = 6 # max numbers(length) in a cell
 CELL_SIZE_Y = len(NUMBERS[0]) + (CELL_PADDING_Y * 2)
-CELL_SIZE_x = (len(NUMBERS[0][0]) * CELL_MAX_NUMBER_LENGTH) + (CELL_PADDING_X * 2)
+CELL_SIZE_x = (len(NUMBERS[0][0]) * CELL_MAX_NUMBER_LENGTH) + (CELL_PADDING_X * 2) + CELL_MAX_NUMBER_LENGTH
 CELL_EMPTY_CHAR = "█" # zeroes in NUMBERS
 CELL_FILL_CHAR = "█" # ones in NUMBERS
 CELL_GAP_CHAR = "█" # between cells
@@ -198,6 +202,11 @@ def add_next_number(table:list,item:int=choose_random_item()):
   table[y][x]=item
   return table
 
+def number_to_color_number(number,colors_dics):
+  for key in list(colors_dics.keys()):
+    if int(number) <= int(key):
+      return key
+  return list(colors_dics.keys())[-1]
 
 # moving cols(top and down) and rows(left and right) with an empty cells x,y only
 def move_col_top(table:list,y,x):
@@ -366,15 +375,67 @@ def draw_border(term):
     # right border
     print(term.move_xy(term.width-WINDOW_BORDER_X, y)+color+f'{border_x}{term.normal}',end='')
 
-def draw_empty_cell(term, y_pos, x_pos):
-  row = (CELL_EMPTY_CHAR*CELL_PADDING_X)+CELL_EMPTY_CHAR*CELL_SIZE_x+(CELL_EMPTY_CHAR*CELL_PADDING_X)
+def draw_empty_cell(term, y_pos, x_pos,color_number):
+  row = (CELL_EMPTY_CHAR*CELL_PADDING_X)+(CELL_EMPTY_CHAR*CELL_SIZE_x)+(CELL_EMPTY_CHAR*CELL_PADDING_X)
   col = CELL_SIZE_Y+(CELL_PADDING_Y*2)
 
   left_start = WINDOW_BORDER_X + WINDOW_PADDING_X +(x_pos*len(row))+(x_pos*CELL_GAP_X)
   top_start = WINDOW_BORDER_Y + WINDOW_PADDING_Y +(y_pos*col)+(y_pos*CELL_GAP_Y)
-  color = term.color_rgb(COLORS["0"][0], COLORS["0"][1], COLORS["0"][2])
+
+  color_number = number_to_color_number(number=color_number,colors_dics=COLORS)
+  color = term.color_rgb(COLORS[color_number][0], COLORS[color_number][1], COLORS[color_number][2])
   for y in range(col):
-    print(term.move_xy(x=left_start+0, y=top_start+y)+ (row)+ term.normal)
+    print(term.move_xy(x=left_start+0, y=top_start+y)+ color+ (row)+ term.normal)
+
+def draw_empty_table(term,table):
+  for y in range(TABLE_SIZE):
+    for x in range(TABLE_SIZE):
+      draw_empty_cell(term=term,y_pos=y,x_pos=x,color_number=str(table[y][x]))
+
+def draw_number_in_cell(term, number, cell_pos_y, cell_pos_x):
+  number_length = len(str(number))*len(NUMBERS[0][0])
+
+  if(number>=10):
+    # add gaps between numbers to number_length
+    number_length += len(str(number))
+
+  # row text
+  row = (CELL_EMPTY_CHAR*CELL_PADDING_X)+(CELL_EMPTY_CHAR*CELL_SIZE_x)+(CELL_EMPTY_CHAR*CELL_PADDING_X)
+
+  # col number length
+  col = CELL_SIZE_Y+(CELL_PADDING_Y*2)
+
+  left_start = WINDOW_BORDER_X + WINDOW_PADDING_X +(cell_pos_x*len(row))+(cell_pos_x*CELL_GAP_X)+CELL_PADDING_X
+
+  if (len(row)>number_length+len(NUMBERS[0][0])):
+    delta = len(row) - number_length
+
+    left_start = left_start + delta//2 - len(NUMBERS[0][0])//2
+
+  top_start = WINDOW_BORDER_Y + WINDOW_PADDING_Y +(cell_pos_y*col)+(cell_pos_y*CELL_GAP_Y)+CELL_PADDING_Y*2
+
+  color_number_fill = number_to_color_number(number=number,colors_dics=COLORS_FILL)
+
+  color_fill = term.color_rgb(COLORS_FILL[color_number_fill][0], COLORS_FILL[color_number_fill][1], COLORS_FILL[color_number_fill][2])
+
+  for i in str(number):
+    num_index = int(i)
+    num_arr = NUMBERS[num_index]
+    for y in range(len(num_arr)):
+      for x in range(len(num_arr[0])):
+        if num_arr[y][x]==1:
+          print(term.move_xy(x=left_start+x, y=top_start+y)
+                + color_fill
+                + CELL_FILL_CHAR
+                + term.normal)
+    left_start += len(NUMBERS[0][0])+1
+
+
+
+
+
+
+
 
 
 
@@ -395,10 +456,10 @@ def main():
 
   print(term.clear)
   draw_border(term)
-  draw_empty_cell(term=term,y_pos=0,x_pos=0)
-  draw_empty_cell(term=term,y_pos=1,x_pos=1)
-  draw_empty_cell(term=term,y_pos=1,x_pos=0)
-  draw_empty_cell(term=term,y_pos=2,x_pos=1)
+  draw_empty_table(term=term,table=game_table)
+  draw_number_in_cell(term=term,number=12,cell_pos_y=0,cell_pos_x=0)
+  draw_number_in_cell(term=term,number=2048,cell_pos_y=1,cell_pos_x=0)
+  draw_number_in_cell(term=term,number=4096,cell_pos_y=1,cell_pos_x=1)
   input()
 
   with term.fullscreen(), term.cbreak(), term.hidden_cursor():
