@@ -499,6 +499,8 @@ def draw_score(term):
 
 
 def new_game():
+  global game_score
+  game_score = 0
   table = new_empty_table(TABLE_SIZE)
   table = add_next_number(table=table)
   table = add_next_number(table=table)
@@ -545,6 +547,7 @@ def main():
 
       exit = True
       if term.inkey(timeout=6).lower()=="r":
+
         key = ""
         game_table = new_game()
         exit = False
