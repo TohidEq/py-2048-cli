@@ -141,7 +141,7 @@ CELL_EMPTY_CHAR = "█" # zeroes in NUMBERS
 CELL_FILL_CHAR = "█" # ones in NUMBERS
 CELL_GAP_CHAR = "█" # between cells
 # - window:
-WINDOW_PADDING_Y = 1
+WINDOW_PADDING_Y = 3
 WINDOW_PADDING_X = 2
 WINDOW_BORDER_Y = 1
 WINDOW_BORDER_X = 2
@@ -149,10 +149,14 @@ WINDOW_WALL_CHAR = "█"
 WINDOW_WALL_COLOR = (153, 51, 0) # RGB
 WINDOW_PADDING_CHAR = " "
 WINDOW_SCORE_TEXT = "SCORE: "
-WINDOW_SCORE_POS_Y = 1
-WINDOW_SCORE_POS_X = 3
+WINDOW_SCORE_COLOR_FILL = (255,255,255)
+WINDOW_SCORE_POS_Y = 2
+WINDOW_SCORE_POS_X = 6
 WINDOW_GOODBYE_TITLE = "Goodbye :D"
 WINDOW_GOODBYE_TEXT = "Press any key to exit or w8 3s"
+
+
+game_score = 0
 
 # funcs
 # - cells funcs:
@@ -268,6 +272,7 @@ def move_table_right(table:list):
 
 # sum cells in 4 directions
 def sum_to_top(table:list):
+  global game_score;
   new_table = copy.deepcopy(table)
   x = 0
   while(x < TABLE_SIZE):
@@ -276,12 +281,14 @@ def sum_to_top(table:list):
       if new_table[y][x] != 0:# not empty
         if new_table[y][x] == new_table[y+1][x]:
           new_table[y][x] *= 2
+          game_score+=new_table[y][x]
           new_table = move_col_top(new_table, y+1, x)
       y += 1
     x += 1
   return new_table
 
 def sum_to_left(table:list):
+  global game_score;
   new_table = copy.deepcopy(table)
   y = 0
   while(y < TABLE_SIZE):
@@ -290,12 +297,14 @@ def sum_to_left(table:list):
       if new_table[y][x] != 0: # not empty
         if new_table[y][x] == new_table[y][x+1]:
           new_table[y][x] *= 2
+          game_score+=new_table[y][x]
           new_table = move_row_left(new_table, y, x+1)
       x += 1
     y += 1
   return new_table
 
 def sum_to_down(table:list):
+  global game_score;
   new_table = copy.deepcopy(table)
   x = 0
   while(x < TABLE_SIZE):
@@ -304,12 +313,14 @@ def sum_to_down(table:list):
       if new_table[y][x] != 0:# not empty
         if new_table[y][x] == new_table[y-1][x]:
           new_table[y][x] *= 2
+          game_score+=new_table[y][x]
           new_table = move_col_down(new_table, y-1, x)
       y -= 1
     x += 1
   return new_table
 
 def sum_to_right(table:list):
+  global game_score;
   new_table = copy.deepcopy(table)
   y = 0
   while(y < TABLE_SIZE):
@@ -318,6 +329,7 @@ def sum_to_right(table:list):
       if new_table[y][x] != 0: # not empty
         if new_table[y][x] == new_table[y][x-1]:
           new_table[y][x] *= 2
+          game_score+=new_table[y][x]
           new_table = move_row_right(new_table, y, x-1)
       x -= 1
     y += 1
@@ -439,7 +451,28 @@ def draw_table(term,table):
       if(number != 0):
         draw_number_in_cell(term=term,number=number,cell_pos_y=y,cell_pos_x=x)
 
+def draw_score(term):
+  global game_score;
+  width = CELL_SIZE_x*TABLE_SIZE + (TABLE_SIZE)
+  text = f"{WINDOW_SCORE_TEXT}{game_score}"
+  pos_y = WINDOW_SCORE_POS_Y
+  pos_x = WINDOW_SCORE_POS_X + (width-len(text))//2
 
+  color_fill = term.color_rgb(
+                              WINDOW_SCORE_COLOR_FILL[0],
+                              WINDOW_SCORE_COLOR_FILL[1],
+                              WINDOW_SCORE_COLOR_FILL[2])
+
+  #clear
+  print(term.move_xy(x=pos_x, y=pos_y)
+                + color_fill
+                + (" "*len(text))
+                + term.normal)
+  #print
+  print(term.move_xy(x=pos_x, y=pos_y)
+                + color_fill
+                + text
+                + term.normal)
 
 
 
@@ -467,13 +500,13 @@ def main():
 
   with term.fullscreen(), term.cbreak(), term.hidden_cursor():
     key = ''
+    draw_border(term)
     while key.lower() != 'q':
 
-      draw_border(term)
       draw_table(term=term, table=game_table)
+      draw_score(term=term)
 
-
-      key = term.inkey(timeout=1)
+      key = term.inkey(timeout=10)
       if key:
         # print("key pressed: {0}".format(key))
         # move_table
