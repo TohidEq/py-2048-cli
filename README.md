@@ -8,6 +8,8 @@
 
 - WASD
 - HJKL(vim like)
+- Q + R => New Game
+- Q + any key => exit
 
 ## run:
 
