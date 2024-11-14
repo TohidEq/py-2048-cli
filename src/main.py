@@ -141,7 +141,7 @@ CELL_EMPTY_CHAR = "█" # zeroes in NUMBERS
 CELL_FILL_CHAR = "█" # ones in NUMBERS
 CELL_GAP_CHAR = "█" # between cells
 # - window:
-WINDOW_PADDING_Y = 3
+WINDOW_PADDING_Y = 1
 WINDOW_PADDING_X = 2
 WINDOW_BORDER_Y = 1
 WINDOW_BORDER_X = 2
@@ -149,11 +149,12 @@ WINDOW_WALL_CHAR = "█"
 WINDOW_WALL_COLOR = (153, 51, 0) # RGB
 WINDOW_PADDING_CHAR = " "
 WINDOW_SCORE_TEXT = "SCORE: "
-WINDOW_SCORE_COLOR_FILL = (255,255,255)
+WINDOW_SCORE_COLOR_FILL = (255,200,100)
+WINDOW_SCORE_COLOR_BG = (0,0,0)
 WINDOW_SCORE_POS_Y = 2
 WINDOW_SCORE_POS_X = 6
 WINDOW_GOODBYE_TITLE = "Goodbye :D"
-WINDOW_GOODBYE_TEXT = "Press any key to exit or w8 3s"
+WINDOW_GOODBYE_TEXT = "R: New Game | Other keys: exit now | Stay 6s: exit auto"
 
 
 game_score = 0
@@ -387,7 +388,7 @@ def draw_border(term):
     # right border
     print(term.move_xy(term.width-WINDOW_BORDER_X, y)+color+f'{border_x}{term.normal}',end='')
 
-def draw_empty_cell(term, y_pos, x_pos,color_number):
+def draw_empty_cell(term, y_pos, x_pos,color_number,custom=()):
   row = (CELL_EMPTY_CHAR*CELL_PADDING_X)+(CELL_EMPTY_CHAR*CELL_SIZE_x)+(CELL_EMPTY_CHAR*CELL_PADDING_X)
   col = CELL_SIZE_Y+(CELL_PADDING_Y*2)
 
@@ -396,6 +397,8 @@ def draw_empty_cell(term, y_pos, x_pos,color_number):
 
   color_number = number_to_color_number(number=color_number,colors_dics=COLORS)
   color = term.color_rgb(COLORS[color_number][0], COLORS[color_number][1], COLORS[color_number][2])
+  if custom != () :
+    color = term.color_rgb(custom[0],custom[1],custom[2])
   for y in range(col):
     print(term.move_xy(x=left_start+0, y=top_start+y)+ color+ (row)+ term.normal)
 
@@ -404,7 +407,7 @@ def draw_empty_table(term,table):
     for x in range(TABLE_SIZE):
       draw_empty_cell(term=term,y_pos=y,x_pos=x,color_number=str(table[y][x]))
 
-def draw_number_in_cell(term, number, cell_pos_y, cell_pos_x):
+def draw_number_in_cell(term, number, cell_pos_y, cell_pos_x,custom=()):
   number_length = len(str(number))*len(NUMBERS[0][0])
 
   if(number>=10):
@@ -426,9 +429,12 @@ def draw_number_in_cell(term, number, cell_pos_y, cell_pos_x):
 
   top_start = WINDOW_BORDER_Y + WINDOW_PADDING_Y +(cell_pos_y*col)+(cell_pos_y*CELL_GAP_Y)+CELL_PADDING_Y*2
 
-  color_number_fill = number_to_color_number(number=number,colors_dics=COLORS_FILL)
+  color_number_fill = number_to_color_number(number=(number),colors_dics=COLORS_FILL)
 
   color_fill = term.color_rgb(COLORS_FILL[color_number_fill][0], COLORS_FILL[color_number_fill][1], COLORS_FILL[color_number_fill][2])
+  if custom != ():
+    color_fill = term.color_rgb(custom[0],custom[1],custom[2])
+
 
   for i in str(number):
     num_index = int(i)
@@ -451,11 +457,11 @@ def draw_table(term,table):
       if(number != 0):
         draw_number_in_cell(term=term,number=number,cell_pos_y=y,cell_pos_x=x)
 
-def draw_score(term):
+def draw_score_simple(term):
   global game_score;
-  width = CELL_SIZE_x*TABLE_SIZE + (TABLE_SIZE)
-  text = f"{WINDOW_SCORE_TEXT}{game_score}"
-  pos_y = WINDOW_SCORE_POS_Y
+  width = CELL_SIZE_x*TABLE_SIZE + (TABLE_SIZE*2)
+  text = f"{WINDOW_SCORE_TEXT}\t{game_score}"
+  pos_y = CELL_SIZE_Y*(TABLE_SIZE+1) + (TABLE_SIZE+1) +1 +WINDOW_BORDER_Y
   pos_x = WINDOW_SCORE_POS_X + (width-len(text))//2
 
   color_fill = term.color_rgb(
@@ -471,23 +477,37 @@ def draw_score(term):
   #print
   print(term.move_xy(x=pos_x, y=pos_y)
                 + color_fill
+                + term.bold
                 + text
                 + term.normal)
 
 
+def draw_score_cell_style(term):
+  draw_empty_cell(term=term,x_pos=TABLE_SIZE,y_pos=0,color_number=0,custom=WINDOW_SCORE_COLOR_BG)
+  draw_number_in_cell(term,game_score,cell_pos_x=TABLE_SIZE,cell_pos_y=0,custom=WINDOW_SCORE_COLOR_FILL)
+
+
+def draw_score(term):
+  width = (CELL_SIZE_x * (TABLE_SIZE+1)) + (TABLE_SIZE+2+2)*2 + WINDOW_PADDING_X*2 + WINDOW_BORDER_X*2
+  if term.width<width:
+    draw_score_simple(term=term)
+  else:
+    draw_score_cell_style(term)
 
 
 
 
 
-
+def new_game():
+  table = new_empty_table(TABLE_SIZE)
+  table = add_next_number(table=table)
+  table = add_next_number(table=table)
+  return table
 
 
 
 def main():
-  game_table = new_empty_table(TABLE_SIZE)
-  game_table = add_next_number(table=game_table)
-  game_table = add_next_number(table=game_table)
+  game_table = new_game()
   # p(game_table)
 
   term = Terminal()
@@ -499,31 +519,40 @@ def main():
   # input()
 
   with term.fullscreen(), term.cbreak(), term.hidden_cursor():
-    key = ''
-    draw_border(term)
-    while key.lower() != 'q':
+    exit = False
+    while exit != True:
+      draw_border(term)
+      key = ''
+      while key.lower() != 'q':
+        draw_table(term=term, table=game_table)
+        draw_score(term=term)
 
-      draw_table(term=term, table=game_table)
-      draw_score(term=term)
-
-      key = term.inkey(timeout=10)
-      if key:
-        # print("key pressed: {0}".format(key))
-        # move_table
-        key = key.upper()
-        if key in KEYS_MOVES:
-          game_table=move_table(table=game_table, move=KEYS_MOVES[key])
+        key = term.inkey(timeout=10)
+        if key:
+          # print("key pressed: {0}".format(key))
+          # move_table
+          key = key.upper()
+          if key in KEYS_MOVES:
+            game_table=move_table(table=game_table, move=KEYS_MOVES[key])
 
 
 
 
+      print(term.clear)
+
+      print(term.move_xy(term.width//2 - (len(WINDOW_GOODBYE_TITLE)//2), term.height//2 - 1)+term.bold(f'{WINDOW_GOODBYE_TITLE}{term.normal}'))
+      print(term.move_xy(term.width//2 - (len(WINDOW_GOODBYE_TEXT)//2), term.height//2 + 1)+term.bold(f'{WINDOW_GOODBYE_TEXT}{term.normal}'))
+
+      exit = True
+      if term.inkey(timeout=6).lower()=="r":
+        key = ""
+        game_table = new_game()
+        exit = False
+        print(term.clear)
+
+
+    # clear screen after end game
     print(term.clear)
-
-    print(term.move_xy(term.width//2 - (len(WINDOW_GOODBYE_TITLE)//2), term.height//2 - 1)+term.bold(f'{WINDOW_GOODBYE_TITLE}{term.normal}'))
-    print(term.move_xy(term.width//2 - (len(WINDOW_GOODBYE_TEXT)//2), term.height//2 + 1)+term.bold(f'{WINDOW_GOODBYE_TEXT}{term.normal}'))
-    term.inkey(timeout=3)
-  # clear screen after end game
-  print(term.clear)
 
 
 
