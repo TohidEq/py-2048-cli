@@ -460,7 +460,7 @@ def draw_table(term,table):
 def draw_score_simple(term):
   global game_score;
   width = CELL_SIZE_x*TABLE_SIZE + (TABLE_SIZE*2)
-  text = f"{WINDOW_SCORE_TEXT}\t{game_score}"
+  text = f"{WINDOW_SCORE_TEXT}{game_score}"
   pos_y = CELL_SIZE_Y*(TABLE_SIZE+1) + (TABLE_SIZE+1) +1 +WINDOW_BORDER_Y
   pos_x = WINDOW_SCORE_POS_X + (width-len(text))//2
 
@@ -472,7 +472,7 @@ def draw_score_simple(term):
   #clear
   print(term.move_xy(x=pos_x, y=pos_y)
                 + color_fill
-                + (" "*len(text))
+                + (" "*(len(text)+10))
                 + term.normal)
   #print
   print(term.move_xy(x=pos_x, y=pos_y)
